@@ -210,3 +210,8 @@ __marimo__/
 # Local tooling / developer-specific files
 # --------------------------------------------------
 codealike.json
+
+# --------------------------------------------------
+# Local development notes
+# --------------------------------------------------
+notes.md
