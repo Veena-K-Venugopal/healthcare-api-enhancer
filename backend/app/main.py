@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.ml.loader import load_model
 from app.ml.state import set_model
+from app.api.routes.predict import router as predict_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -10,6 +11,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="Healthcare API Enhancer", lifespan=lifespan)
+
+app.include_router(predict_router)
 
 @app.get("/health")
 def health():
