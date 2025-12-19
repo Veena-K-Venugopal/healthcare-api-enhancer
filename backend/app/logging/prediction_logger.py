@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import hashlib
 import os
 from pathlib import Path
+from typing import Optional
 
 DEFAULT_LOG_PATH = "backend/logs/predictions.jsonl"
 
@@ -16,3 +17,23 @@ def _sha256(text: str) -> str:
 # file path helper; returns log file path as pathlib.Path object
 def _get_log_path() -> Path:
     return Path(os.getenv("PREDICT_LOG_PATH", DEFAULT_LOG_PATH))
+
+#log writer helper
+def log_prediction_event(
+        *,
+        request_id: str,
+        input_text: str,
+        prediction: str,
+        model_version: str,
+        latency_ms: int,
+        cached: bool = False,
+        error: Optional[str] = None,
+) -> None:
+    """
+    Append one JSONL event to a local file.
+
+    PII-safe by design:
+    - does NOT store raw input_text
+    - stores only length + sha256 hash
+    """
+    return
