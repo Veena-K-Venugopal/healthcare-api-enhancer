@@ -18,7 +18,7 @@ def _sha256(text: str) -> str:
 def _get_log_path() -> Path:
     return Path(os.getenv("PREDICT_LOG_PATH", DEFAULT_LOG_PATH))
 
-#log writer helper
+#log writer function; appends one JSONL event to log file
 def log_prediction_event(
         *,
         request_id: str,
@@ -36,4 +36,16 @@ def log_prediction_event(
     - does NOT store raw input_text
     - stores only length + sha256 hash
     """
-    return
+    record = {
+        "ts": _utc_iso(),
+        "request_id": request_id,
+        "input_length": len(input_text),
+        "input_hash": _sha256(input_text),
+        "prediction": prediction,
+        "model_version": model_version,
+        "latency_ms": latency_ms,
+        "cached": cached,
+    }
+
+    if error:
+        record["error"] = error
