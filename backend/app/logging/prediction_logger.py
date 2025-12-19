@@ -3,6 +3,7 @@ import hashlib
 import os
 from pathlib import Path
 from typing import Optional
+import json
 
 DEFAULT_LOG_PATH = "backend/logs/predictions.jsonl"
 
@@ -49,3 +50,9 @@ def log_prediction_event(
 
     if error:
         record["error"] = error
+
+    log_path = _get_log_path()
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with log_path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
