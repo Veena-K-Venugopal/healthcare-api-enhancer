@@ -50,9 +50,13 @@ def log_prediction_event(
 
     if error:
         record["error"] = error
+    
+    try:
+        log_path = _get_log_path()
+        log_path.parent.mkdir(parents=True, exist_ok=True)
 
-    log_path = _get_log_path()
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with log_path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        with log_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    
+    except Exception:
+        return
