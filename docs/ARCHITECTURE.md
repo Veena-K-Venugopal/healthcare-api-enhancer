@@ -3,7 +3,7 @@
 This document explains the **current system architecture** and the reasoning
 behind key design decisions.
 
-It reflects the state of the system as of **v0.2.0**.
+It reflects the state of the system as of **v0.3.0**.
 
 ---
 
@@ -72,14 +72,33 @@ FastAPI’s lifespan mechanism is used to guarantee correct timing.
 
 ---
 
-## Inference Flow
+## Observability (Minimal, Intentional)
+
+As of v0.3.0, observability is intentionally lightweight:
+- file-based JSONL logging
+- privacy-safe metadata only (no raw input text)
+- request-level correlation via request_id
+- latency measurement for performance insight
+
+This establishes an observability foundation
+without introducing premature infrastructure.
+
+---
+
+## Inference Flow (Post v0.3.0)
 
 1. Application starts
-2. Model is loaded once during startup
+2. Model is loaded once during startup (FastAPI lifespan)
 3. Model is stored in application state
 4. Requests arrive at `/predict`
-5. Endpoint retrieves the already-loaded model from state
-6. Response is returned
+5. Input is validated and normalized at the schema layer
+6. Request-level instrumentation is applied:
+   - request_id generated
+   - high-resolution latency timer started
+7. Endpoint retrieves the already-loaded model from state
+8. Prediction is generated (placeholder at this stage)
+9. A PII-safe prediction event is logged
+10. Response is returned to the client
 
 The model is **never loaded per request**.
 
@@ -92,21 +111,28 @@ The model is **never loaded per request**.
 - Returns a placeholder prediction
 - Confirms correct lifecycle wiring
 
-No training or inference logic is included yet.
+No real ML inference logic is included yet.
+
+As of v0.3.0, the endpoint additionally includes:
+- schema-level input validation and normalization
+- request_id generation
+- latency measurement
+- PII-safe prediction logging (file-based, JSONL)
 
 ---
 
 ## Out-of-Scope (By Design)
 
-As of v0.2.0, the system intentionally does not include:
+As of v0.3.0, the system intentionally does not include:
 - model training pipelines
-- databases or persistence
-- logging or monitoring
-- caching
-- authentication
-- deployment configuration
+- databases or persistence layers
+- caching beyond local memory
+- authentication or authorization
+- frontend UI or dashboards
+- Docker or cloud deployment configuration
+- MLflow or drift monitoring
 
-These are planned for future incremental releases.
+These will be introduced incrementally in future releases.
 
 ---
 
